@@ -1,0 +1,173 @@
+.signUp {
+  .flex {
+    display: flex;
+  }
+
+  .title {
+    padding: 20px 0px;
+    color: rgba(0, 0, 0, .85);
+    font-weight: 500;
+    font-size: 16px;
+
+    &.top {
+      padding-top: 0px;
+    }
+
+    .title-content {
+      border-left: 3px solid #409EFF;
+      padding-left: 10px;
+    }
+  }
+
+  .top-container,.order-detail-container,.order-pay-container,.order-handle-container,.order-bottom-container {
+    // card 内左右
+    .item {
+      padding: 10px 25px;
+
+      &:first-child {
+        border-right: 1px solid #dcdbdb;
+      }
+
+      &.un-right-border {
+        border-right: none;
+      }
+
+      &.border-left {
+        border-left: 1px solid #dcdbdb;
+      }
+
+      .form-title {
+        width: 80px;
+      }
+    }
+  }
+
+
+  .app-container {
+  }
+
+  .top-container {
+    border-bottom: 3px solid #f5f7f9;
+    margin: 0 -10px;
+    padding: 0 10px 10px 10px;
+
+    .stu-info {
+      padding: 15px 0 8px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      .info-item {
+        padding-right: 15px;
+      }
+    }
+  }
+
+  // 报名信息
+  .order-detail-container {
+    padding: 15px 10px 5px 10px;
+    position: relative;
+    margin: 0 -10px;
+
+    .choose-btn {
+      left: 120px;
+      position: absolute;
+      top: 10px;
+    }
+    .course-item {
+      margin-bottom: 15px;
+      font-size: 14px;
+
+      .header {
+        background-color: #f3f3f3;
+        height: 45px;
+        line-height: 45px;
+        padding: 0px 15px;
+
+        .close-btn {
+          font-size: 20px;
+          padding: 8px 0px 8px 8px;
+          color: #f56c6c;
+          cursor: pointer;
+          font-weight: bolder;
+        }
+
+        .sum-hour, .fee {
+          padding: 0px 5px;
+        }
+      }
+
+      .content {
+        .fee-info {
+          height: 25px;
+          line-height: 25px;
+        }
+        .bottom {
+          .item {
+            border-right: none;
+          }
+          border-top: 1px solid #dcdbdb;
+        }
+      }
+    }
+  }
+
+  // 办理信息
+  .order-handle-container{
+    border-top: 3px solid #f5f7f9;
+    padding: 15px 10px 70px 10px;
+    margin: 0 -10px;
+    position: relative;
+    .fee-info {
+      height: 25px;
+      line-height: 25px;
+    }
+    .dept-input {
+      left: 120px;
+      position: absolute;
+      top: 10px;
+      .form-title {
+        width: 80px;
+      }
+    }
+  }
+  // 支付信息
+  .order-pay-container{
+    border-top: 3px solid #f5f7f9;
+    padding: 15px 10px 15px 10px;
+    margin: 0 -10px;
+    position: relative;
+    .fee-info {
+      height: 25px;
+      line-height: 25px;
+    }
+    .dept-input {
+      left: 120px;
+      position: absolute;
+      top: 10px;
+      .form-title {
+        width: 80px;
+      }
+    }
+  }
+
+  .order-bottom-container {
+    position: absolute;
+    bottom: 0px;
+    right: 6px;
+    left: 6px;
+    height: 70px;
+    padding: 10px 4px;
+    background-color: #fff;
+    line-height: 30px;
+    border-top: 2px solid #f5f7f9;
+    .height-half {
+      height: 24px;
+      line-height: 24px;
+    }
+    .height-all {
+      height: 48px;
+      line-height: 48px;
+    }
+  }
+}

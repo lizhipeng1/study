@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xluobo.business.sc.base.repo.mapper.ScRoomMapper">
+
+    <select id="selectList" resultType="cn.xluobo.business.sc.base.domain.resp.RespRoomInfo">
+        select a.*,b.dept_name
+        from sc_room a left join sys_dept b on a.dept_id=b.dept_id
+        where 1=1
+        <if test="reqSearchScRoom.deptId != null and reqSearchScRoom.deptId != ''">
+            and a.dept_id=#{reqSearchScRoom.deptId}
+        </if>
+        <if test="reqSearchScRoom.roomName != null and reqSearchScRoom.roomName != ''">
+            and a.room_name like concat('%',#{reqSearchScRoom.roomName},'%')
+        </if>
+        <if test="reqSearchScRoom.memo != null and reqSearchScRoom.memo != ''">
+            and a.memo like concat('%',#{reqSearchScRoom.memo},'%')
+        </if>
+    </select>
+    <select id="selectForSelect" resultType="cn.xluobo.business.sc.base.domain.resp.RespRoomSelect">
+        select
+               a.room_id,
+               concat(a.room_name,'(',b.dept_name,')') as room_name
+        from sc_room a left join sys_dept b on a.dept_id=b.dept_id
+        where 1=1
+        <if test="deptId != null and deptId != ''">
+            and a.dept_id=#{deptId}
+        </if>
+        order by a.create_time desc
+    </select>
+</mapper>

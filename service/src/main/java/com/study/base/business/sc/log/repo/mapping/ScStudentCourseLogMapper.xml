@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xluobo.business.sc.log.repo.mapper.ScStudentCourseLogMapper">
+
+    <select id="selectForSearchTable" resultType="cn.xluobo.business.sc.log.repo.model.ScStudentCourseLog">
+        select a.*,b.student_name from sc_student_course_log a left join sc_student b on a.student_id=b.student_id
+        where 1=1
+        <if test="reqSearchStuCourseLog.studentId != null">
+            and a.student_id=#{reqSearchStuCourseLog.studentId}
+        </if>
+        <if test="reqSearchStuCourseLog.courseId != null">
+            and a.course_id=#{reqSearchStuCourseLog.courseId}
+        </if>
+        <if test="reqSearchStuCourseLog.claId != null">
+            and a.cla_id=#{reqSearchStuCourseLog.claId}
+        </if>
+        <if test="reqSearchStuCourseLog.logType != null and reqSearchStuCourseLog.logType != ''">
+            and a.log_type=#{reqSearchStuCourseLog.logType}
+        </if>
+        <if test="reqSearchStuCourseLog.beginDate != null and reqSearchStuCourseLog.beginDate != '' and reqSearchStuCourseLog.endDate != null and reqSearchStuCourseLog.endDate != ''">
+            and a.create_time between
+                STR_TO_DATE(concat(#{reqSearchStuCourseLog.beginDate},' 00:00:00'),'%Y-%m-%d %H:%i:%s')
+                and
+                STR_TO_DATE(concat(#{reqSearchStuCourseLog.endDate},' 23:59:59'),'%Y-%m-%d %H:%i:%s')
+        </if>
+        order by a.log_id desc
+    </select>
+</mapper>

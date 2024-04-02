@@ -1,0 +1,260 @@
+@import './variables.scss';
+@import './mixin.scss';
+@import './transition.scss';
+@import './element-ui.scss';
+@import './sidebar.scss';
+
+body {
+  height: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Arial, sans-serif;
+}
+
+label {
+  font-weight: 700;
+}
+
+html {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+#app {
+  height: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+a:focus,
+a:active {
+  outline: none;
+}
+
+a,
+a:focus,
+a:hover {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+div:focus {
+  outline: none;
+}
+
+.clearfix {
+  &:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
+}
+
+// main-container global css
+.app-container {
+  padding: 16px;
+}
+
+.app-container.bg-grey {
+  background-color: $bgColorGrey;
+}
+
+// select 可新增 begin
+.select-with-btn-container {
+  position: relative;
+}
+
+.select-with-btn-container .el-button.el-button--small, .select-with-btn-container .el-button.el-button--medium {
+  width: 40px;
+  position: absolute;
+  right: 0px;
+  margin-top: 2px;
+}
+
+.select-with-btn-container .el-select.el-select--small, .select-with-btn-container .el-select.el-select--medium{
+  padding-right: 42px;
+}
+// select 可新增 end
+
+// input 颜色选择 begin
+.input-with-color-picker-container {
+  position: relative;
+}
+
+.input-with-color-picker-container .el-color-picker {
+  width: 40px;
+  position: absolute;
+  right: 0px;
+}
+
+.input-with-color-picker-container .el-input.el-input--medium{
+  padding-right: 42px;
+}
+// input 颜色选择 end
+
+// dialog begin
+.el-dialog__header {
+  padding: 16px 24px;
+  color: rgba(0,0,0,.65);
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 2px 2px 0 0;
+}
+.el-dialog__body {
+  padding: 24px;
+  font-size: 14px;
+  line-height: 1.5715;
+}
+.el-dialog__footer {
+  padding: 10px 16px;
+  text-align: right;
+  background: 0 0;
+  border-top: 1px solid #f0f0f0;
+  border-radius: 0 0 2px 2px;
+}
+// dialog end
+
+// 紧凑form
+.compact .el-form-item{
+  margin-bottom: 5px;
+}
+
+// 紧凑dialog
+.compact {
+  &.top0 {
+    .el-dialog__body{
+      padding-top: 0;
+    }
+  }
+  .el-dialog__body{
+    padding: 15px;
+  }
+}
+
+// 新增form 大小
+.add-form {
+  .el-select .el-input {
+    width: 206px;
+  }
+  .el-input, .el-input-number{
+    width: 206px;
+  }
+  .auto-width .el-input{
+    width: auto;
+  }
+  .el-date-editor.el-input{
+    width: 206px;
+  }
+  &.auto-width {
+    .el-date-editor.el-input, .el-date-editor.el-input__inner, .el-input, .el-input-number {
+      width: auto;
+    }
+  }
+}
+
+.dialog-footer {
+  .footer-left-txt {
+    line-height: 36px;
+    color: #606266;
+    font-size: 13px;
+  }
+}
+// 左对齐
+.align-left {
+  text-align: left;
+}
+// 右对齐
+.align-right {
+  text-align: right;
+}
+// 不换行
+.inline-block {
+  display: inline-block;
+}
+
+.flex {
+  display: flex;
+  &.space-between {
+    justify-content: space-between;
+  }
+}
+
+.compact.el-card .el-card__body{
+  padding: 0px;
+}
+
+/*文字 样式 begin*/
+.important {
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 0px 3px;
+  &.green {
+    color: #67C23A;
+    font-weight: normal;
+    font-size: 14px;
+  }
+  &.blue {
+    color: #409EFF;
+    font-weight: normal;
+    font-size: 14px;
+  }
+  &.normal {
+    font-weight: normal;
+    font-size: 14px;
+  }
+  &.red {
+    color: #F56C6C;
+    font-weight: normal;
+    font-size: 14px;
+  }
+  &.f18 {
+    font-size: 18px;
+  }
+}
+
+.mr15 {
+  margin-right: 15px;
+}
+
+.un-important {
+  color: #888888;
+  font-size: 12px;
+  &.f14 {
+    font-size: 14px;
+  }
+  &.black {
+    color: #333;
+  }
+  &.normal {
+    color: #606266;
+  }
+  &.f16 {
+    font-size: 16px;
+  }
+  &.f18 {
+    font-size: 18px;
+  }
+  &.through {
+    text-decoration: line-through;
+  }
+  &.blue {
+    color: #409EFF;
+  }
+}
+/*文字 样式 end*/
+// 必填
+.need-input:before{
+  content: '*';
+  color: #F56C6C;
+  margin-right: 4px;
+}

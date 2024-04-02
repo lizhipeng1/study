@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xluobo.business.sc.student.repo.mapper.ScStudentCourseMapper">
+
+    <select id="selectStudentCourseNameList" resultType="java.lang.String">
+        select distinct b.course_name
+        from sc_student_course a
+            left join sc_course b on a.course_id=b.course_id
+        where a.student_id = #{studentId} and a.status = '1'
+    </select>
+    <select id="selectStudentDeptNameList" resultType="java.lang.String">
+        select distinct c.dept_name
+        from sc_student_course a
+                 left join sc_course_cla b on a.cla_id=b.cla_id
+                 left join sys_dept c on b.depart_id=c.dept_id
+        where a.student_id = #{studentId} and a.status = '1' and a.cla_id is not null
+    </select>
+    <select id="selectStudentList" resultType="cn.xluobo.business.sc.student.domain.resp.RespCourseClaStudent">
+        select a.student_course_id,a.cla_id,a.course_id,
+               d.dept_name,
+               a.charge_type,a.total_day,a.total_hour,
+               a.balance_hour,
+               case a.charge_type when 'date' then null else (select ifnull(sum(co.balance_hour),0) from sc_student_course_order co where a.student_course_id=co.student_course_id and co.valid=1 and date_format(now(),'%Y-%m-%d') <![CDATA[ > ]]> co.expire_date) end as expire_hour,
+               case a.charge_type when 'date' then (select ifnull(sum(co.total_day),0) from sc_student_course_order co where a.student_course_id=co.student_course_id and co.valid=1 and date_format(now(),'%Y-%m-%d') <![CDATA[ < ]]> co.begin_date) end as coming_effect_day,
+               case a.charge_type when 'date' then (select co.end_date from sc_student_course_order co where a.student_course_id=co.student_course_id and co.valid=1 and date_format(now(),'%Y-%m-%d') between co.begin_date and co.end_date limit 1) end as end_date,
+               a.status,
+               a.create_time as first_sign_time,
+               (select co.create_time from sc_student_course_order co where a.student_course_id=co.student_course_id and co.valid=1 order by co.create_time desc limit 1) as last_sign_time,
+               b.student_id,b.student_name,b.sex,b.phone,
+               (select group_concat(sc.contact_nick,'(',fcn_dict_name(sc.contact_relation,'contact_relation'),') ',sc.contact_phone separator ';') from sc_student_contact sc where sc.student_id=b.student_id) as contact_info
+        from sc_student_course a left join sys_dept d on a.dept_id=d.dept_id
+           ,sc_student b
+        where a.student_id=b.student_id
+        <if test="reqSearchStudentCourseCla.claId != null">
+            and a.cla_id=#{reqSearchStudentCourseCla.claId}
+        </if>
+        <if test="reqSearchStudentCourseCla.departId != null">
+            and a.dept_id=#{reqSearchStudentCourseCla.departId}
+        </if>
+        <if test="reqSearchStudentCourseCla.deptId == null and reqSearchStudentCourseCla.userId != null and reqSearchStudentCourseCla.userId != ''">
+            and exists(select 1 from sys_user_dept ud
+            where ud.user_id=#{reqSearchStudentCourseCla.userId}
+            and (ud.dept_id=a.dept_id or ud.dept_id=-1))
+        </if>
+        <if test="reqSearchStudentCourseCla.courseId != null">
+            and a.course_id=#{reqSearchStudentCourseCla.courseId}
+        </if>
+        <if test="reqSearchStudentCourseCla.unChooseCla != null and reqSearchStudentCourseCla.unChooseCla == true">
+            and a.cla_id is null
+        </if>
+        <if test="reqSearchStudentCourseCla.unChooseCla != null and reqSearchStudentCourseCla.unChooseCla == false">
+            and a.cla_id is not null
+        </if>
+        <if test="reqSearchStudentCourseCla.effect != null and reqSearchStudentCourseCla.effect == true">
+            and a.status='1'
+            and (charge_type in ('hour','cycle')
+                or (charge_type='date' and exists(
+                select 1 from sc_student_course_order sco
+                where a.student_course_id=sco.student_course_id
+                  and sco.valid=1
+                  and date_format(now(),'%Y-%m-%d') between sco.begin_date and sco.end_date)))
+        </if>
+        order by a.create_time desc
+    </select>
+    <select id="selectClaNeedAttendCnt" resultType="int">
+        select count(1) from sc_student_course sc
+        where sc.cla_id=#{claId}
+          and sc.status='1'
+          and (charge_type in ('hour','cycle')
+            or (charge_type='date' and exists(
+                    select 1 from sc_student_course_order sco
+                    where sc.student_course_id=sco.student_course_id
+                      and sco.valid=1
+                      and date_format(now(),'%Y-%m-%d') between sco.begin_date and sco.end_date)))
+    </select>
+    <select id="selectStudentCourseList" resultType="cn.xluobo.business.sc.student.domain.resp.RespStudentCourse">
+        select a.student_course_id,a.course_name,a.charge_type,a.total_day,a.total_hour,
+               a.balance_hour,
+               case a.charge_type when 'date' then null else (select ifnull(sum(co.balance_hour),0) from sc_student_course_order co where a.student_course_id=co.student_course_id and co.valid=1 and date_format(now(),'%Y-%m-%d') <![CDATA[ > ]]> co.expire_date) end as expire_hour,
+               a.total_fee,a.status,
+               b.student_id,b.student_name,c.dept_name,d.cla_name,
+                (select case a.charge_type
+                    when 'date' then group_concat(sco.total_day, ',', sco.begin_date, '~', sco.end_date separator ';')
+                    else group_concat(sco.total_hour, ',', date_format(sco.create_time, '%Y%m%d') separator ';')
+                    end
+                    from sc_student_course_order sco
+                    where a.student_course_id = sco.student_course_id and sco.valid=1) as order_detail,
+            case a.charge_type when 'date' then (select ifnull(sum(co.total_day),0) from sc_student_course_order co where a.student_course_id=co.student_course_id and co.valid=1 and date_format(now(),'%Y-%m-%d') <![CDATA[ < ]]> co.begin_date) end as coming_effect_day,
+            case a.charge_type when 'date' then (select co.end_date from sc_student_course_order co where a.student_course_id=co.student_course_id and co.valid=1 and date_format(now(),'%Y-%m-%d') between co.begin_date and co.end_date limit 1) end as end_date
+        from sc_student_course a
+            left join sc_student b on a.student_id=b.student_id
+            left join sys_dept c on a.dept_id=c.dept_id
+            left join sc_course_cla d on a.cla_id=d.cla_id
+        where 1=1
+        <if test="studentId != null">
+            and a.student_id=#{studentId}
+        </if>
+        <if test="deptId != null">
+            and a.dept_id=#{deptId}
+        </if>
+        <if test="deptId == null and userId != null and userId != ''">
+            and exists(select 1 from sys_user_dept ud
+            where ud.user_id=#{userId}
+            and (ud.dept_id=a.dept_id or ud.dept_id=-1))
+        </if>
+        order by a.create_time desc
+    </select>
+    <delete id="deleteWhenTotalHourZeroForInvalid">
+        delete from sc_student_course where student_course_id=#{studentCourseId} and charge_type <![CDATA[ <> ]]> 'date' and total_hour=0 and total_fee=0
+    </delete>
+    <delete id="deleteWhenTotalDayZeroForInvalid">
+        delete from sc_student_course where student_course_id=#{studentCourseId} and charge_type = 'date' and total_day=0 and total_fee=0
+    </delete>
+    <select id="selectWillExpireDateCount" resultType="java.lang.Integer">
+        select count(1) from sc_student_course sc
+        where sc.charge_type='date' and sc.status='1'
+          and exists(select 1 from sc_student_course_order sco
+            where sco.student_course_id=sc.student_course_id
+            and sco.valid=1
+            and date_format(now(),'%Y-%m-%d') between sco.begin_date and sco.end_date
+            and (datediff(sco.end_date,now())+1+((select ifnull(sum(sco.total_day),0) from sc_student_course_order sco_will_effect
+                                                where sco_will_effect.student_course_id=sc.student_course_id
+                                                and sco_will_effect.valid=1 and date_format(now(),'%Y-%m-%d') <![CDATA[ < ]]> sco_will_effect.begin_date))
+                ) <![CDATA[ <= ]]> #{minBalanceDay})
+    </select>
+    <select id="selectWillExpireHourCount" resultType="java.lang.Integer">
+        select count(1) from sc_student_course sc
+        where sc.charge_type <![CDATA[ <> ]]> 'date'
+          and sc.status='1'
+          and (sc.balance_hour - (select ifnull(sum(sco.balance_hour),0)
+                                  from sc_student_course_order sco
+                                  where sc.student_course_id=sco.student_course_id
+                                    and sco.valid=1 and date_format(now(),'%Y-%m-%d') <![CDATA[ > ]]> sco.expire_date)
+              ) <![CDATA[ <= ]]> #{minBalanceHour}
+    </select>
+    <select id="selectStudentSignUpList" resultType="cn.xluobo.business.sc.student.domain.resp.RespStuCourseSignUpStudent">
+        select a.student_course_id,
+            a.cla_id,a.cla_name,
+            a.course_id,a.course_name,
+            d.dept_name,
+            a.charge_type,a.total_day,a.total_hour,
+            a.balance_hour,
+            (select case a.charge_type
+                when 'date' then group_concat(sco.total_day, ',', sco.begin_date, '~', sco.end_date separator ';')
+                else group_concat(sco.total_hour, ',', date_format(sco.create_time, '%Y%m%d') separator ';')
+                end
+                from sc_student_course_order sco
+                where a.student_course_id = sco.student_course_id and sco.valid=1) as order_detail,
+            (select sum(co.total_fee) from sc_student_course_order co where a.student_course_id=co.student_course_id and co.valid=1) as total_fee,
+            (select sum(co.balance_hour * co.unit_fee) from sc_student_course_order co where a.student_course_id=co.student_course_id and co.valid=1) as balance_fee,
+            case a.charge_type when 'date' then null else (select ifnull(sum(co.balance_hour),0) from sc_student_course_order co where a.student_course_id=co.student_course_id and co.valid=1 and date_format(now(),'%Y-%m-%d') <![CDATA[ > ]]> co.expire_date) end as expire_hour,
+            case a.charge_type when 'date' then null else (select ifnull(sum(co.balance_hour * co.unit_fee),0) from sc_student_course_order co where a.student_course_id=co.student_course_id and co.valid=1 and date_format(now(),'%Y-%m-%d') <![CDATA[ > ]]> co.expire_date) end as expire_fee,
+            case a.charge_type when 'date' then (select ifnull(sum(co.total_day),0) from sc_student_course_order co where a.student_course_id=co.student_course_id and co.valid=1 and date_format(now(),'%Y-%m-%d') <![CDATA[ < ]]> co.begin_date) end as coming_effect_day,
+            case a.charge_type when 'date' then (select co.end_date from sc_student_course_order co where a.student_course_id=co.student_course_id and co.valid=1 and date_format(now(),'%Y-%m-%d') between co.begin_date and co.end_date limit 1) end as end_date,
+            a.status,
+            a.create_time as first_sign_time,
+            (select co.create_time from sc_student_course_order co where a.student_course_id=co.student_course_id and co.valid=1 order by co.create_time desc limit 1) as last_sign_time,
+            b.student_id,b.student_name,b.sex,b.phone,
+            (select group_concat(sc.contact_nick,'(',fcn_dict_name(sc.contact_relation,'contact_relation'),') ',sc.contact_phone separator ';') from sc_student_contact sc where sc.student_id=b.student_id) as contact_info
+        from sc_student_course a
+        left join sys_dept d on a.dept_id=d.dept_id
+        ,sc_student b
+        where a.student_id=b.student_id
+        <if test="reqSearchStuCourseSignUp.claId != null">
+            and a.cla_id=#{reqSearchStuCourseSignUp.claId}
+        </if>
+        <if test="reqSearchStuCourseSignUp.departId != null">
+            and a.dept_id=#{reqSearchStuCourseSignUp.departId}
+        </if>
+        <if test="reqSearchStuCourseSignUp.courseId != null">
+            and a.course_id=#{reqSearchStuCourseSignUp.courseId}
+        </if>
+        <if test="reqSearchStuCourseSignUp.minBalanceDay != null">
+            and a.charge_type='date' and a.status='1'
+            and exists(select 1 from sc_student_course_order sco
+            where sco.student_course_id=a.student_course_id
+            and sco.valid=1
+            and date_format(now(),'%Y-%m-%d') between sco.begin_date and sco.end_date
+            and (datediff(sco.end_date,now())+1+((select ifnull(sum(sco.total_day),0) from sc_student_course_order sco_will_effect
+            where sco_will_effect.student_course_id=a.student_course_id
+            and sco_will_effect.valid=1 and date_format(now(),'%Y-%m-%d') <![CDATA[ < ]]> sco_will_effect.begin_date))
+            ) <![CDATA[ <= ]]> #{reqSearchStuCourseSignUp.minBalanceDay})
+        </if>
+        <if test="reqSearchStuCourseSignUp.minBalanceHour != null">
+            and a.charge_type <![CDATA[ <> ]]> 'date' and a.status='1'
+            and (a.balance_hour - (select ifnull(sum(sco.balance_hour),0)
+            from sc_student_course_order sco
+            where a.student_course_id=sco.student_course_id
+            and sco.valid=1 and date_format(now(),'%Y-%m-%d') <![CDATA[ > ]]> sco.expire_date)
+            ) <![CDATA[ <= ]]> #{reqSearchStuCourseSignUp.minBalanceHour}
+        </if>
+        order by a.create_time desc
+    </select>
+</mapper>

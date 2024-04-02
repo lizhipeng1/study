@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xluobo.business.sc.student.repo.mapper.ScStudentCourseOrderMapper">
+
+    <select id="checkDateCover" resultType="int">
+        select count(1) from sc_student_course a,sc_student_course_order b
+        where a.student_course_id=b.student_course_id
+          and a.student_id=#{studentId}
+          and a.course_id=#{courseId}
+          and b.valid=1
+          and exists(select 1 from sc_order_detail c where b.order_detail_id=c.order_detail_id and c.charge_type='date')
+          and (#{beginDate} between b.begin_date and b.end_date or #{endDate} between b.begin_date and b.end_date)
+    </select>
+    <select id="selectSubtractHourOrder" resultType="cn.xluobo.business.sc.student.repo.model.ScStudentCourseOrder">
+        select * from sc_student_course_order a
+        where a.student_course_id=#{studentCourseId}
+          and ((a.expire_date is not null and date_format(now(),'%Y-%m-%d') <![CDATA[ <= ]]> a.expire_date)
+                   or (a.expire_date is null))
+          and a.valid=1
+          and exists(select 1 from sc_order_detail b where a.order_detail_id=b.order_detail_id and b.charge_type <![CDATA[ <> ]]> 'date')
+        order by create_time limit 1
+    </select>
+    <select id="selectNowValidDateOrder" resultType="cn.xluobo.business.sc.student.repo.model.ScStudentCourseOrder">
+        select * from sc_student_course_order a
+        where a.student_course_id=#{studentCourseId}
+          and a.total_day <![CDATA[ > ]]> 0
+          and date_format(now(),'%Y-%m-%d') between a.begin_date and a.end_date
+          and a.valid=1
+          and exists(select 1 from sc_order_detail b where a.order_detail_id=b.order_detail_id and b.charge_type = 'date')
+        order by create_time limit 1
+    </select>
+    <select id="selectSubtractHourOrderList" resultType="cn.xluobo.business.sc.student.repo.model.ScStudentCourseOrder">
+        select * from sc_student_course_order a
+        where a.student_course_id=#{studentCourseId}
+          and a.balance_hour <![CDATA[ > ]]> 0
+          and ((a.expire_date is not null and date_format(now(),'%Y-%m-%d') <![CDATA[ <= ]]> a.expire_date)
+                   or (a.expire_date is null))
+          and a.valid=1
+          and exists(select 1 from sc_order_detail b where a.order_detail_id=b.order_detail_id and b.charge_type <![CDATA[ <> ]]> 'date')
+        order by create_time
+    </select>
+    <select id="selectRecoverHourOrderList" resultType="cn.xluobo.business.sc.student.repo.model.ScStudentCourseOrder">
+        select * from sc_student_course_order a
+        where a.student_course_id=#{studentCourseId}
+          and a.valid=1
+          and exists(select 1 from sc_order_detail b where a.order_detail_id=b.order_detail_id and b.charge_type <![CDATA[ <> ]]> 'date')
+        order by create_time desc
+    </select>
+    <update id="updateSubtractHour">
+        update sc_student_course_order set balance_hour = #{newHour} where course_order_id=#{courseOrderId} and balance_hour = #{oldHour}
+    </update>
+</mapper>

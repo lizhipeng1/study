@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xluobo.business.sc.course.repo.mapper.ScClaTimeAttendMapper">
+
+    <select id="selectTimeAttendList" resultType="cn.xluobo.business.sc.course.domain.resp.time.RespClaTimeAttend">
+        select cta.attend_id,s.student_id,s.student_name,cta.charge_type,
+               cta.teacher_id,cta.teacher_name,cta.attend_status,cta.pay_hour,cta.pay_fee,
+               cta.memo,
+               ct.real_cla_date,ct.real_start_time,ct.real_end_time,cta.create_time,
+               scc.cla_name
+        from sc_cla_time_attend cta
+                 left join sc_student s on cta.student_id=s.student_id
+                 left join sc_cla_time ct on cta.course_time_id=ct.course_time_id
+                 left join sc_course_cla scc on cta.cla_id=scc.cla_id
+        where s.tenant_id=#{reqSearchScClaTimeAttend.tenantId}
+        <if test="reqSearchScClaTimeAttend.courseTimeId != null">
+            and cta.course_time_id=#{reqSearchScClaTimeAttend.courseTimeId}
+        </if>
+        <if test="reqSearchScClaTimeAttend.studentId != null">
+            and cta.student_id=#{reqSearchScClaTimeAttend.studentId}
+        </if>
+        <if test="reqSearchScClaTimeAttend.studentCourseId != null">
+            and cta.student_course_id=#{reqSearchScClaTimeAttend.studentCourseId}
+        </if>
+        <if test="reqSearchScClaTimeAttend.teacherId != null">
+            and cta.teacher_id=#{reqSearchScClaTimeAttend.teacherId}
+        </if>
+        <if test="reqSearchScClaTimeAttend.attendStatus != null and reqSearchScClaTimeAttend.attendStatus != ''">
+            and cta.attend_status=#{reqSearchScClaTimeAttend.attendStatus}
+        </if>
+        <if test="reqSearchScClaTimeAttend.deptId != null">
+            and scc.depart_id=#{reqSearchScClaTimeAttend.deptId}
+        </if>
+        <if test="reqSearchScClaTimeAttend.deptId == null and reqSearchScClaTimeAttend.userId != null and reqSearchScClaTimeAttend.userId != ''">
+            and exists(select 1 from sys_user_dept ud
+            where ud.user_id=#{reqSearchScClaTimeAttend.userId}
+            and (ud.dept_id=scc.depart_id or ud.dept_id=-1))
+        </if>
+        order by cta.attend_id desc
+    </select>
+    <select id="selectStudentAttendCount" resultType="int">
+        select count(1) from sc_cla_time_attend a
+        where student_course_id=#{studentCourseId}
+          and exists(select 1 from sc_cla_time b where a.course_time_id=b.course_time_id and b.real_cla_date between #{beginDate} and #{endDate} )
+    </select>
+    <select id="selectNeedAttendCount" resultType="java.lang.Integer">
+        select count(1) from sc_course_cla cc,sc_cla_time ct,sc_student_course sc
+        where ct.cla_date between #{beginDate} and #{endDate}
+          and cc.cla_id=ct.cla_id
+          and cc.cla_id=sc.cla_id
+          and sc.status='1'
+          and (sc.charge_type in ('hour','cycle')
+            or (charge_type='date' and exists(
+                    select 1 from sc_student_course_order sco
+                    where sc.student_course_id=sco.student_course_id
+                      and sco.valid=1
+                      and date_format(now(),'%Y-%m-%d') between sco.begin_date and sco.end_date)))
+    </select>
+    <select id="selectAttendCount" resultType="java.lang.Integer">
+        select count(1) from sc_course_cla cc,sc_cla_time_attend cta,sc_cla_time ct
+        where cta.attend_status in
+          <foreach collection="attendStatus" item="item" open="(" close=")" separator=",">
+              #{item}
+          </foreach>
+          and ct.course_time_id=cta.course_time_id
+          and ct.cla_id=cc.cla_id
+          and ct.cla_date between #{beginDate} and #{endDate}
+    </select>
+    <select id="selectAttendCostHour" resultType="java.math.BigDecimal">
+        select  ifnull(sum(cta.pay_hour),0) from sc_course_cla cc,sc_cla_time_attend cta,sc_cla_time ct
+        where ct.course_time_id=cta.course_time_id
+             and ct.cla_id=cc.cla_id
+             and ct.cla_date between #{beginDate} and #{endDate}
+    </select>
+    <select id="selectNeedAttendCostHour" resultType="java.math.BigDecimal">
+        select ifnull(sum(ct.pay_hour),0)
+        from sc_course_cla cc,sc_cla_time ct,sc_student_course sc
+        where ct.cla_date between #{beginDate} and #{endDate}
+          and ct.cla_id=cc.cla_id
+          and cc.cla_id=sc.cla_id
+          and sc.status='1'
+          and (sc.charge_type in ('hour','cycle')
+            or (charge_type='date' and exists(
+                    select 1 from sc_student_course_order sco
+                    where sc.student_course_id=sco.student_course_id
+                      and sco.valid=1
+                      and date_format(now(),'%Y-%m-%d') between sco.begin_date and sco.end_date)))
+
+    </select>
+    <select id="selectTeacherSumGetHour" resultType="java.math.BigDecimal">
+        select ifnull(sum(b.teacher_get_hour),0) from sc_course_cla a,sc_cla_time_attend b
+        where a.delete_flag='0' and a.cla_id=b.cla_id and b.teacher_id=#{teacherId} and b.charge_type <![CDATA[ <> ]]> 'date'
+        and exists(select 1 from sc_cla_time c
+            where b.course_time_id=c.course_time_id
+              and c.real_cla_date between #{beginDate} and #{endDate} )
+        <if test="deptId != null">
+            and a.depart_id=#{deptId}
+        </if>
+        <if test="deptId == null and userId != null and userId != ''">
+            and exists(select 1 from sys_user_dept ud
+            where ud.user_id=#{userId}
+            and (ud.dept_id=a.depart_id or ud.dept_id=-1))
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,8 @@
+.idea
+logs
+qyxt.iml
+**/target
+*.iml
+export/**
+/web-mini/node_modules/**
+/web-mini/miniprogram_npm/**

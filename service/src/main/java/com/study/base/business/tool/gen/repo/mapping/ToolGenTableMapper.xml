@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xluobo.business.tool.gen.repo.mapper.ToolGenTableMapper">
+
+    <select id="selectDbTableNotGenList" resultType="cn.xluobo.business.tool.gen.repo.model.ToolGenTable">
+        select table_name, table_comment, create_time, update_time as last_update_time
+        from information_schema.tables
+        where table_schema = (select database())
+        <foreach collection="dbTableParams.excludeTables" item="item" open=" and table_name not in (" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="dbTableParams.tableName != null and dbTableParams.tableName != ''">
+            and table_name like concat('%',#{dbTableParams.tableName},'%')
+        </if>
+        <if test="dbTableParams.tableComment != null and dbTableParams.tableComment != ''">
+            and table_comment like concat('%',#{dbTableParams.tableComment},'%')
+        </if>
+        order by create_time desc
+    </select>
+    <select id="selectDbTableListByTableName" resultType="cn.xluobo.business.tool.gen.repo.model.ToolGenTable">
+        select table_name, table_comment, create_time, update_time
+        from information_schema.tables
+        where table_schema = (select database())
+        <foreach collection="tables" item="item" open=" and table_name in (" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

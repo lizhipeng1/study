@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xluobo.business.sc.order.repo.mapper.ScOrderMapper">
+
+    <select id="selectFroSearchTable" resultType="cn.xluobo.business.sc.order.domain.resp.RespOrder">
+        select
+            a.order_id,a.order_type,a.actual_total_fee,a.receipt_fee,a.balance_fee,
+            (select s.staff_name from sys_staff s where s.staff_id=a.sale_staff_id) sale_staff_name,
+            a.order_tag,a.handle_dept_name,a.handle_date,
+            (select u.name from sys_user u where user_id=a.create_user) as create_user_name,
+            a.memo,
+            b.student_name,b.phone,
+            (select group_concat(od.course_name,'(',d.dept_name,')',',',od.charge_name,' 数量:',od.buy_count separator ';') from sc_order_detail od left join sys_dept d on od.dept_id=d.dept_id where a.order_id=od.order_id) as order_detail,
+            a.order_status
+        from sc_order a
+                 left join sc_student b on a.student_id=b.student_id
+        where 1=1
+        <if test="reqSearchScOrder.studentId != null">
+            and a.student_id = #{reqSearchScOrder.studentId}
+        </if>
+        <if test="reqSearchScOrder.handleDateBegin != null and reqSearchScOrder.handleDateBegin != ''">
+            and a.handle_date between #{reqSearchScOrder.handleDateBegin} and #{reqSearchScOrder.handleDateEnd}
+        </if>
+        <if test="reqSearchScOrder.arrears">
+            and actual_total_fee <![CDATA[ > ]]> balance_fee + receipt_fee
+        </if>
+        <if test="reqSearchScOrder.arrears != null and reqSearchScOrder.arrears == true">
+            and actual_total_fee <![CDATA[ > ]]> balance_fee + receipt_fee
+        </if>
+        <if test="reqSearchScOrder.arrears != null and reqSearchScOrder.arrears == false">
+            and actual_total_fee <![CDATA[ = ]]> balance_fee + receipt_fee
+        </if>
+        <if test="reqSearchScOrder.deptId != null">
+            and exists(select 1 from sc_order_detail d where a.order_id=d.order_id and d.dept_id=#{reqSearchScOrder.deptId} )
+        </if>
+        <if test="reqSearchScOrder.courseId != null">
+            and exists(select 1 from sc_order_detail d where a.order_id=d.order_id and d.course_id=#{reqSearchScOrder.courseId} )
+        </if>
+        <if test="reqSearchScOrder.saleStaffId != null">
+            and a.sale_staff_id = #{reqSearchScOrder.saleStaffId}
+        </if>
+        <if test="reqSearchScOrder.orderType != null and reqSearchScOrder.orderType != ''">
+            and a.order_type = #{reqSearchScOrder.orderType}
+        </if>
+        <if test="reqSearchScOrder.orderStatus != null and reqSearchScOrder.orderStatus != ''">
+            and a.order_status = #{reqSearchScOrder.orderStatus}
+        </if>
+        <if test="reqSearchScOrder.createUser != null">
+            and a.create_user = #{reqSearchScOrder.createUser}
+        </if>
+        <if test="reqSearchScOrder.saleSourceTag != null and reqSearchScOrder.saleSourceTag != ''">
+            and a.sale_source_tag = #{reqSearchScOrder.saleSourceTag}
+        </if>
+        order by a.create_time desc
+    </select>
+    <select id="selectArrearsStudentCount" resultType="java.lang.Integer">
+        select count(distinct o.student_id) from sc_order o where o.order_status='2' and o.receipt_fee+o.balance_fee <![CDATA[ < ]]> o.actual_total_fee
+    </select>
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xluobo.business.stock.info.repo.mapper.StockInfoMapper">
+
+    <select id="selectByCondition" resultType="cn.xluobo.business.stock.info.repo.model.StockInfo">
+        select a.*,
+               sg.goods_name, sd.dept_name, sc.category_name
+        from stock_info a
+                     left join stock_goods sg on a.goods_id = sg.goods_id
+                     left join stock_category sc on sg.category_id = sc.category_id
+                     left join sys_dept sd on a.dept_id = sd.dept_id
+        where 1=1
+        <if test="reqSearchStockInfo.goodsId != null and reqSearchStockInfo.goodsId != ''">
+            and a.goods_id = #{reqSearchStockInfo.goodsId}
+        </if>
+        <if test="reqSearchStockInfo.categoryId != null and reqSearchStockInfo.categoryId != ''">
+            and sg.category_id = #{reqSearchStockInfo.categoryId}
+        </if>
+        <if test="reqSearchStockInfo.deptId != null and reqSearchStockInfo.deptId != ''">
+            and a.dept_id = #{reqSearchStockInfo.deptId}
+        </if>
+        <if test="reqSearchStockInfo.maxStockCnt != null">
+            and a.stock_cnt <![CDATA[ <= ]]> #{reqSearchStockInfo.maxStockCnt}
+        </if>
+        order by a.create_time desc
+    </select>
+</mapper>

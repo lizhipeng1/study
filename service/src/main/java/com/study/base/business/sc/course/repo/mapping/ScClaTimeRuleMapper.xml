@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xluobo.business.sc.course.repo.mapper.ScClaTimeRuleMapper">
+
+    <select id="selectByCondition" resultType="cn.xluobo.business.sc.course.domain.resp.time.RespClaTimeRule">
+        select b.*,fcn_dict_name_list(b.week_day,'week_day') as week_day_name,
+               a.cla_name,c.course_name,d.staff_name
+        from sc_course_cla a, sc_cla_time_rule b, sc_course c, sys_staff d
+        where a.cla_id = b.cla_id and a.course_id=c.course_id and b.teacher_id=d.staff_id
+        <if test="reqSearchScClaTimeRule.deptId != null">
+            and a.depart_id=#{reqSearchScClaTimeRule.deptId}
+        </if>
+        <if test="reqSearchScClaTimeRule.claId != null">
+            and b.cla_id=#{reqSearchScClaTimeRule.claId}
+        </if>
+        <if test="reqSearchScClaTimeRule.teacherId != null">
+            and b.teacher_id=#{reqSearchScClaTimeRule.teacherId}
+        </if>
+        <if test="reqSearchScClaTimeRule.filterHoliday != null and reqSearchScClaTimeRule.filterHoliday == true">
+            and b.filter_holiday='1'
+        </if>
+        <if test="reqSearchScClaTimeRule.filterHoliday != null and reqSearchScClaTimeRule.filterHoliday == false">
+            and b.filter_holiday='0'
+        </if>
+        <if test="reqSearchScClaTimeRule.beginDate != null and reqSearchScClaTimeRule.beginDate != ''">
+            and (#{reqSearchScClaTimeRule.beginDate} between b.begin_date and b.end_date
+                     or #{reqSearchScClaTimeRule.endDate} between b.begin_date and b.end_date
+                     or b.begin_date between #{reqSearchScClaTimeRule.beginDate} and #{reqSearchScClaTimeRule.endDate}
+                or exists(select 1 from sc_cla_time ct where b.rule_id=ct.rule_id and ct.source='1' and ct.cla_date between #{reqSearchScClaTimeRule.beginDate} and #{reqSearchScClaTimeRule.endDate} ))
+        </if>
+        order by b.create_time desc
+    </select>
+    <select id="selectByDay" resultType="cn.xluobo.business.sc.course.domain.resp.time.RespClaTimeRule">
+        select b.*,
+               a.cla_name,c.course_name,d.staff_name
+        from sc_course_cla a, sc_cla_time_rule b, sc_course c, sys_staff d
+        where a.cla_id = b.cla_id and a.course_id=c.course_id
+          and b.teacher_id=d.staff_id
+          and b.cla_id=#{claId}
+          and #{day} between b.begin_date and b.end_date
+    </select>
+    <select id="selectByRuleId" resultType="cn.xluobo.business.sc.course.domain.resp.time.RespClaTimeRule">
+        select b.*,
+        a.cla_name,c.course_name,d.staff_name
+        from sc_course_cla a, sc_cla_time_rule b, sc_course c, sys_staff d
+        where a.cla_id = b.cla_id and a.course_id=c.course_id and b.teacher_id=d.staff_id
+        and b.rule_id=#{ruleId}
+    </select>
+    <select id="selectClaTimeInfo" resultType="java.lang.String">
+        select concat(fcn_dict_name_list(a.week_day,'week_day'),' ',substr(a.start_time,1,5),'~',substr(a.end_time,1,5),' (',a.begin_date,'~',a.end_date,')') as cla_time
+        from sc_cla_time_rule a
+        where a.cla_id=#{claId}
+          and a.rule_type='1'
+          and repeat_type in ('1','3')
+          and (date_format(now(),'%Y-%m-%d') between a.begin_date and a.end_date or date_format(now(),'%Y-%m-%d') <![CDATA[ < ]]> a.begin_date)
+        order by a.begin_date
+    </select>
+</mapper>

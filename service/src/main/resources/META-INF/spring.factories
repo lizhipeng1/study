@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    cn.xluobo.config.properties.GenCodeConfig

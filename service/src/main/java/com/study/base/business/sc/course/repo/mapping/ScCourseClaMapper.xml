@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xluobo.business.sc.course.repo.mapper.ScCourseClaMapper">
+
+    <select id="selectClaList" resultType="cn.xluobo.business.sc.course.domain.resp.RespCourseClaInfo">
+        select
+            a.cla_id,a.cla_name,
+            (select count(1) from sc_student_course sc where sc.cla_id=a.cla_id and sc.status='1') as student_cnt,
+            a.capacity,a.recruit_status,a.open_date,
+            b.course_id,b.course_name,
+            c.staff_id,c.staff_name,
+            sd.dept_name,
+            (select group_concat(fcn_dict_name_list(r.week_day,'week_day'),' ',substr(r.start_time,1,5),'~',substr(r.end_time,1,5),' (',r.begin_date,'~',r.end_date,')' SEPARATOR ';')
+                from sc_cla_time_rule r
+                where a.cla_id=r.cla_id
+                  and r.rule_type='1'
+                  and repeat_type in ('1','3')
+                  and (date_format(now(),'%Y-%m-%d') between r.begin_date and r.end_date or date_format(now(),'%Y-%m-%d') <![CDATA[ < ]]> r.begin_date)) as week_day
+        from sc_course_cla a
+            left join sc_course b on a.course_id=b.course_id
+            left join sys_staff c on a.staff_id=c.staff_id
+            left join sys_dept sd on a.depart_id=sd.dept_id
+        where a.delete_flag='0'
+        <if test="reqSearchScCourseCla.courseId != null">
+            and a.course_id=#{reqSearchScCourseCla.courseId}
+        </if>
+        <if test="reqSearchScCourseCla.staffId != null">
+            and a.staff_id=#{reqSearchScCourseCla.staffId}
+        </if>
+        <if test="reqSearchScCourseCla.claName != null and reqSearchScCourseCla.claName != ''">
+            and a.cla_name like concat('%',#{reqSearchScCourseCla.claName},'%')
+        </if>
+        <if test="reqSearchScCourseCla.departId != null">
+            and a.depart_id=#{reqSearchScCourseCla.departId}
+        </if>
+        <if test="reqSearchScCourseCla.deptId == null and reqSearchScCourseCla.userId != null and reqSearchScCourseCla.userId != ''">
+            and exists(select 1 from sys_user_dept ud
+            where ud.user_id=#{reqSearchScCourseCla.userId}
+            and (ud.dept_id=a.depart_id or ud.dept_id=-1))
+        </if>
+        <if test="reqSearchScCourseCla.chargeType != null and reqSearchScCourseCla.chargeType != ''">
+            and exists(select 1 from sc_course_charge cc where cc.course_id=b.course_id and cc.charge_type=#{reqSearchScCourseCla.chargeType} )
+        </if>
+        and a.delete_flag='0'
+        order by a.create_time desc
+    </select>
+    <select id="selectForSelect" resultType="cn.xluobo.business.sc.course.domain.resp.RespCourseClaSelectInfo">
+        select a.cla_id,a.cla_name,b.course_id,b.course_name,c.staff_name,
+               dept.dept_id,
+               dept.dept_name
+        from sc_course_cla a
+            left join sc_course b on a.course_id=b.course_id
+            left join sys_staff c on a.staff_id=c.staff_id
+            left join sys_dept dept on a.depart_id=dept.dept_id
+        where a.delete_flag='0'
+        <if test="search != null and search != ''">
+            and (a.cla_name like concat('%',#{search},'%')
+                     or b.course_name like concat('%',#{search},'%')
+                     or c.staff_name like concat('%',#{search},'%')
+                )
+        </if>
+        order by a.create_time desc limit 0,#{maxRecord}
+    </select>
+    <select id="selectClaCount" resultType="java.lang.Integer">
+        select count(1) from sc_course_cla cc
+        where cc.delete_flag='0'
+        <if test="teacherId != null">
+            and cc.staff_id=#{teacherId}
+        </if>
+        <if test="deptId != null">
+            and cc.depart_id=#{deptId}
+        </if>
+        <if test="deptId == null and userId != null and userId != ''">
+            and exists(select 1 from sys_user_dept ud
+            where ud.user_id=#{userId}
+              and (ud.dept_id=cc.depart_id or ud.dept_id=-1))
+        </if>
+    </select>
+    <select id="selectTenantClaCount" resultType="java.lang.Integer">
+        select count(1) from sc_course_cla where tenant_id=#{tenantId} and delete_flag='0'
+    </select>
+    <select id="selectStudentCnt" resultType="java.lang.Integer">
+        select count(1) from sc_student_course sc where sc.cla_id=#{claId} and sc.status='1'
+    </select>
+</mapper>

@@ -1,0 +1,96 @@
+.calendar-title{
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
+}
+.calendar-top{
+  max-width: 90%;
+  padding-bottom: 15px;
+  margin: auto;
+  color: #303133;
+
+  .now-count{
+    text-align: left;
+    line-height: 36px;
+    font-size: 14px!important;
+  }
+
+  .btn-group{
+    text-align: right;
+  }
+}
+.fc th{
+  line-height: 25px;
+}
+.full-calendar {
+  margin: 0 auto;
+  max-width: 90%;
+}
+.fc-event.course-event{
+  background-color: #fff;
+  border-color: #e6e6e6;
+}
+.event-item{
+  padding: 5px 2px 2px 2px;
+  color: #333;
+  .tag-container{
+    padding-bottom: 3px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-around;
+    .course-tag{
+      padding: 3px;
+      border-radius: 3px;
+    }
+    .status-tag{
+      padding: 3px;
+      border-radius: 3px;
+    }
+    .tag{
+      &-primary{
+        background-color: #409EFF;
+        color: #fff;
+      }
+      &-success{
+        background-color: #67C23A;
+        color: #fff;
+      }
+      &-warning{
+        background-color: #E6A23C;
+        color: #fff;
+      }
+      &-danger{
+        background-color: #F56C6C;
+        color: #fff;
+      }
+    }
+    .time{
+      line-height: 22px;
+      &-primary{
+        color: #409EFF;
+      }
+      &-disable{
+        color: #909399;
+      }
+      &-success{
+        color: #67C23A;
+      }
+      &-warning{
+        color: #E6A23C;
+      }
+      &-danger{
+        color: #F56C6C;
+      }
+    }
+  }
+}
+.date-container{
+  display: flex;justify-content: center;
+  .left,.right{
+    cursor: pointer;
+    padding: 0px 5px;
+    i{
+      color: #409EFF;font-size: 36px;
+    }
+  }
+}
