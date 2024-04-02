@@ -11,19 +11,19 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class APIBaseResponse {
+public class BaseResponse {
 
     String respCode;
 
     String respMsg;
 
 
-    public static APIBaseResponse success(){
-        return new APIBaseResponse("0000","success");
+    public static BaseResponse success(){
+        return new BaseResponse("0000","success");
     }
 
-    public static APIBaseResponse fail(String failMsg){
-        return new APIBaseResponse("9999",failMsg);
+    public static BaseResponse fail(String failMsg){
+        return new BaseResponse("9999",failMsg);
     }
 
     public boolean isSuccess(){

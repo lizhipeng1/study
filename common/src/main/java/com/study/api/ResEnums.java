@@ -4,7 +4,7 @@ package com.study.api;
  * @author lzp
  */
 
-public enum ApiResEnums {
+public enum ResEnums {
     SC_UNAUTHORIZED("0401","401"),
     SC_FORCE_OFFLINE("0511","强制踢出,请重新登录"),
     SC_INVALID_TOKEN("0513","登录信息失效,请重新登录"),
@@ -27,7 +27,7 @@ public enum ApiResEnums {
     private String respCode;
     private String respMsg;
 
-    ApiResEnums(String respCode, String respMsg) {
+    ResEnums(String respCode, String respMsg) {
         this.respCode = respCode;
         this.respMsg = respMsg;
     }
