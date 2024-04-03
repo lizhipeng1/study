@@ -1,8 +1,8 @@
 package com.study.config.oauth2;
 
-import cn.xluobo.config.integration.IntegrationAuthenticationFilter;
-import cn.xluobo.config.login.LoginUser;
-import cn.xluobo.config.security.CustomUserService;
+import com.study.config.integration.IntegrationAuthenticationFilter;
+import com.study.config.login.LoginUser;
+import com.study.config.security.CustomUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;

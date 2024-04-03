@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.business.sc.course.repo.mapper.ScCourseMapper">
+
+    <select id="selectCourseList" resultType="com.study.business.sc.course.domain.resp.course.RespSearchCourse">
+        select a.course_id,a.course_name,
+               a.course_type_id,
+               b.course_type as course_type_name,a.teaching_mode,
+               (select count(1) from sc_course_cla cc where a.course_id=cc.course_id) as cla_count,
+               (select group_concat(distinct charge.charge_type) from sc_course_charge charge where a.course_id=charge.course_id) as charge_names,
+               (select group_concat(distinct charge.depart_id) from sc_course_charge charge where a.course_id=charge.course_id) as campus_ids,
+               a.create_time,
+               a.sale,
+               a.course_intro
+        from sc_course a
+                 left join sc_course_type b on a.course_type_id = b.course_type_id and b.in_use='1'
+        where a.delete_flag='0'
+        <if test="reqSearchScCourse.courseName != null and reqSearchScCourse.courseName != ''">
+            and a.course_name like concat('%',#{reqSearchScCourse.courseName} ,'%')
+        </if>
+        <if test="reqSearchScCourse.sale != null and reqSearchScCourse.sale != ''">
+            and a.sale = #{reqSearchScCourse.sale}
+        </if>
+        <if test="reqSearchScCourse.courseTypeId != null and reqSearchScCourse.courseTypeId != ''">
+            and a.course_type_id = #{reqSearchScCourse.courseTypeId}
+        </if>
+        <if test="reqSearchScCourse.teachingMode != null and reqSearchScCourse.teachingMode != ''">
+            and a.teaching_mode = #{reqSearchScCourse.teachingMode}
+        </if>
+        <if test="reqSearchScCourse.departId != null">
+            and exists(select 1 from sc_course_charge c where a.course_id=c.course_id and (c.depart_id=#{reqSearchScCourse.departId} or c.depart_id=-1))
+        </if>
+        <if test="reqSearchScCourse.chargeType != null and reqSearchScCourse.chargeType != ''">
+            and exists(select 1 from sc_course_charge c where a.course_id=c.course_id and c.charge_type=#{reqSearchScCourse.chargeType} )
+        </if>
+        order by a.sale desc,a.create_time desc
+    </select>
+    <select id="selectCourseListWithStudentCourse" resultType="com.study.business.sc.course.domain.resp.course.RespSearchCourse">
+        select a.course_id,a.course_name,b.course_type as course_type_name,a.teaching_mode,
+            (select count(1) from sc_course_cla cc where a.course_id=cc.course_id) as cla_count,
+            (select group_concat(distinct charge.charge_type) from sc_course_charge charge where a.course_id=charge.course_id) as charge_names,
+            (select group_concat(distinct charge.depart_id) from sc_course_charge charge where a.course_id=charge.course_id) as campus_ids,
+            a.create_time,
+            a.sale,
+            a.course_intro,
+            c.student_course_id
+        from sc_course a
+            left join sc_course_type b on a.course_type_id = b.course_type_id and b.in_use='1'
+            left join sc_student_course c on a.course_id=c.course_id and c.student_id = #{reqSearchScCourse.studentId}
+        where a.delete_flag='0'
+        <if test="reqSearchScCourse.courseName != null and reqSearchScCourse.courseName != ''">
+            and a.course_name like concat('%',#{reqSearchScCourse.courseName} ,'%')
+        </if>
+        <if test="reqSearchScCourse.sale != null and reqSearchScCourse.sale != ''">
+            and a.sale = #{reqSearchScCourse.sale}
+        </if>
+        <if test="reqSearchScCourse.courseTypeId != null and reqSearchScCourse.courseTypeId != ''">
+            and a.course_type_id = #{reqSearchScCourse.courseTypeId}
+        </if>
+        <if test="reqSearchScCourse.teachingMode != null and reqSearchScCourse.teachingMode != ''">
+            and a.teaching_mode = #{reqSearchScCourse.teachingMode}
+        </if>
+        <if test="reqSearchScCourse.departId != null">
+            and exists(select 1 from sc_course_charge c where a.course_id=c.course_id and (c.depart_id=#{reqSearchScCourse.departId} or c.depart_id=-1))
+        </if>
+        <if test="reqSearchScCourse.chargeType != null and reqSearchScCourse.chargeType != ''">
+            and exists(select 1 from sc_course_charge c where a.course_id=c.course_id and c.charge_type=#{reqSearchScCourse.chargeType} )
+        </if>
+        order by a.sale desc,a.create_time desc
+    </select>
+    <select id="selectCourseForExport" resultType="com.study.business.sc.course.domain.export.ExpCourse">
+        select a.course_id,
+               b.charge_id,
+               a.course_name,
+               (select t.course_type from sc_course_type t where t.course_type_id=a.course_type_id) course_type_name,
+               fcn_dict_name(a.teaching_mode,'teaching_mode') as teaching_mode,
+               a.create_time,
+               fcn_dict_name(a.sale,'sale') as sale,
+               a.course_intro,
+               case b.depart_id when -1 then '全部校区' else (select t.dept_name from sys_dept t where t.dept_id=b.depart_id) end depart_name,
+               b.charge_type,fcn_dict_name(b.charge_type,'charge_type') as charge_type_name,
+               b.date_unit,
+               fcn_dict_name(b.date_unit,'date_unit') as date_unit_name,
+               b.count,b.total_fee
+        from sc_course a,sc_course_charge b
+        where a.course_id=b.course_id and a.delete_flag='0'
+        <if test="reqSearchScCourse.courseName != null and reqSearchScCourse.courseName != ''">
+            and a.course_name like concat('%',#{reqSearchScCourse.courseName} ,'%')
+        </if>
+        <if test="reqSearchScCourse.sale != null and reqSearchScCourse.sale != ''">
+            and a.sale = #{reqSearchScCourse.sale}
+        </if>
+        <if test="reqSearchScCourse.courseTypeId != null and reqSearchScCourse.courseTypeId != ''">
+            and a.course_type_id = #{reqSearchScCourse.courseTypeId}
+        </if>
+        <if test="reqSearchScCourse.teachingMode != null and reqSearchScCourse.teachingMode != ''">
+            and a.teaching_mode = #{reqSearchScCourse.teachingMode}
+        </if>
+        <if test="reqSearchScCourse.departId != null">
+            and b.depart_id=#{reqSearchScCourse.departId}
+        </if>
+        <if test="reqSearchScCourse.chargeType != null and reqSearchScCourse.chargeType != ''">
+            and b.charge_type=#{reqSearchScCourse.chargeType}
+        </if>
+        order by a.sale desc,a.create_time desc limit 2000
+    </select>
+    <select id="selectCourseCount" resultType="java.lang.Integer">
+        select count(1) from sc_course a
+        where 1=1
+        <if test="deptId != null">
+            and exists(select 1 from sc_course_charge b where a.course_id=b.course_id and (b.depart_id=#{deptId} or b.depart_id=-1))
+        </if>
+        <if test="deptId == null and userId != null and userId != ''">
+            and (
+                exists(select 1 from sc_course_charge b,sys_user_dept ud
+                    where ud.user_id=#{userId}
+                      and (ud.dept_id=b.depart_id or ud.dept_id=-1)
+                      and a.course_id=b.course_id)
+                or exists(select 1 from sc_course_charge b where a.course_id=b.course_id and b.depart_id=-1)
+                )
+        </if>
+    </select>
+    <select id="selectTenantCourseCount" resultType="java.lang.Integer">
+        select count(1) from sc_course where tenant_id=#{tenantId}
+    </select>
+</mapper>

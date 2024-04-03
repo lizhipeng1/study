@@ -8,10 +8,11 @@
     <artifactId>study</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>common</module>
         <module>config</module>
+        <module>common</module>
         <module>oauth</module>
-        <module>service</module>
+        <module>server</module>
+        <module>dal</module>
     </modules>
     <version>1.0-SNAPSHOT</version>
 
@@ -21,7 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <base-common.version>1.0-SNAPSHOT</base-common.version>
+        <base.version>1.0-SNAPSHOT</base.version>
         <base-service.version>1.0-SNAPSHOT</base-service.version>
         <base-config-redis.version>1.0-SNAPSHOT</base-config-redis.version>
         <base-oauth-server.version>1.0-SNAPSHOT</base-oauth-server.version>
@@ -46,10 +47,32 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>com.study</groupId>
+                <artifactId>common</artifactId>
+                <version>${base.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.study</groupId>
                 <artifactId>config</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>${base.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.study</groupId>
+                <artifactId>dal</artifactId>
+                <version>${base.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.study</groupId>
+                <artifactId>oauth</artifactId>
+                <version>${base.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.study</groupId>
+                <artifactId>server</artifactId>
+                <version>${base.version}</version>
             </dependency>
 
             <dependency>

@@ -1,6 +1,6 @@
 package com.study.config.security;
 
-import cn.xluobo.core.utils.aes.EncryptUtil;
+import com.study.core.utils.aes.EncryptUtil;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;

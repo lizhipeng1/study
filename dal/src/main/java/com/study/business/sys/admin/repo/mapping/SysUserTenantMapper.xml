@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.business.sys.admin.repo.mapper.SysUserTenantMapper">
+
+    <select id="selectUserDefaultTenant" resultType="string">
+        select a.tenant_id from sys_tenant a
+        where exists(select 1 from sys_user_tenant b where a.tenant_id=b.tenant_id and b.user_id=#{userId,jdbcType=BIGINT})
+          and now() between a.begin_time and a.end_time
+        order by a.begin_time asc,a.tenant_id asc limit 1
+    </select>
+</mapper>

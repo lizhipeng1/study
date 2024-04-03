@@ -1,6 +1,6 @@
 package com.study.config.security;
 
-import cn.xluobo.core.api.APIBaseResponse;
+import com.study.core.api.APIBaseResponse;
 import com.alibaba.fastjson.JSON;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;

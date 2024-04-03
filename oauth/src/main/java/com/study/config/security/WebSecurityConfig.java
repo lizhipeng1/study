@@ -1,7 +1,7 @@
 package com.study.config.security;
 
+import com.study.core.api.APIBaseResponse;
 import cn.jljiayu.filter.ValidateCodeFilter;
-import cn.xluobo.core.api.APIBaseResponse;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

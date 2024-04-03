@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.business.sys.admin.repo.mapper.SysTenantMapper">
+
+    <select id="selectUserTenantList" resultType="com.study.business.sys.admin.repo.model.SysTenant">
+        select t.tenant_id,t.tenant_name
+        from sys_tenant t,sys_user_tenant ut
+        where t.delete_flag='0'
+          and t.tenant_id=ut.tenant_id and ut.user_id=#{userId}
+        <if test="limitTenantUserId != null and limitTenantUserId != ''">
+            and exists(select 1 from sys_user_tenant utl where utl.user_id=#{limitTenantUserId} and utl.tenant_id=t.tenant_id)
+        </if>
+        order by t.create_time desc
+    </select>
+    <select id="selectInUseUserTenant" resultType="com.study.business.sys.admin.repo.model.SysTenant">
+        select * from sys_tenant t,sys_user_tenant ut
+        where t.tenant_id=ut.tenant_id
+          and ut.user_id=#{userId} and ut.tenant_id=#{tenantId}
+          and now() between t.begin_time and t.end_time
+          and t.in_use='1'
+          and t.delete_flag='0'
+    </select>
+</mapper>

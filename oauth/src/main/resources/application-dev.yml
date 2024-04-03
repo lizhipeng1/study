@@ -1,0 +1,11 @@
+server:
+  port: 9092
+
+wx:
+  miniapp:
+    configs:
+      - appid: 1
+        secret: 2
+        token: 3
+        aesKey: gZZI8aq2UztVXUSyIo18Xup4uPiCYKlRCBa9hZCYi5L
+        msgDataFormat: JSON

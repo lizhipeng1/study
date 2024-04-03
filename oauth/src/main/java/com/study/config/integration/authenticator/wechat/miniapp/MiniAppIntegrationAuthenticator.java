@@ -1,10 +1,10 @@
 package com.study.config.integration.authenticator.wechat.miniapp;
 
-import cn.xluobo.business.sys.admin.repo.model.SysUser;
-import cn.xluobo.business.wechat.user.service.IWechatUserInfoService;
-import cn.xluobo.config.integration.IntegrationAuthentication;
-import cn.xluobo.config.integration.authenticator.IntegrationAuthenticator;
-import cn.xluobo.config.login.LoginUser;
+import com.study.business.sys.admin.repo.model.SysUser;
+import com.study.business.wechat.user.service.IWechatUserInfoService;
+import com.study.config.integration.IntegrationAuthentication;
+import com.study.config.integration.authenticator.IntegrationAuthenticator;
+import com.study.config.login.LoginUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;

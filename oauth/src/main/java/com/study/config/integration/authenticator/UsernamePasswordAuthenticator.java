@@ -1,8 +1,8 @@
 package com.study.config.integration.authenticator;
 
-import cn.xluobo.business.sys.admin.service.ISysUserService;
-import cn.xluobo.config.integration.IntegrationAuthentication;
-import cn.xluobo.config.login.LoginUser;
+import com.study.business.sys.admin.service.ISysUserService;
+import com.study.config.integration.IntegrationAuthentication;
+import com.study.config.login.LoginUser;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;

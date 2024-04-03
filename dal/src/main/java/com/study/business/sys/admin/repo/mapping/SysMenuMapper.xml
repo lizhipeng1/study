@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.business.sys.admin.repo.mapper.SysMenuMapper">
+
+    <select id="selectUserMenuPermissionMeta" resultType="java.lang.String">
+        select a.permission_meta from sys_menu a
+        where a.permission_meta is not null and a.enable='1' and a.permission_meta <![CDATA[ <> ]]> ''
+        <if test="userId != null and userId != '' and tenantId != null and tenantId != ''">
+          and exists(
+            select 1 from sys_user b,sys_user_role c,sys_role_menu d
+            where b.user_id=c.user_id and c.tenant_id=#{tenantId}
+              and b.user_id=#{userId}
+              and c.role_id=d.role_id
+              and d.menu_id=a.menu_id
+            )
+        </if>
+        order by sort
+    </select>
+    <select id="selectAllMenuPermissionUrl" resultType="com.study.business.sys.admin.repo.model.SysMenu">
+        select * from sys_menu a
+        where a.request_url is not null and a.request_url <![CDATA[ <> ]]> ''
+        order by sort
+    </select>
+    <select id="selectUserMenuList" resultType="com.study.business.sys.admin.repo.model.SysMenu">
+        select * from sys_menu a
+        where exists(
+                select 1 from sys_user b,sys_user_role c,sys_role_menu d
+                where b.user_id=c.user_id and c.tenant_id=#{tenantId}
+                  and b.user_id=#{userId}
+                  and c.role_id=d.role_id
+                  and d.menu_id=a.menu_id
+            )
+        and a.menu_type <![CDATA[ <> ]]> 'button'
+        and a.enable='1'
+        order by sort
+    </select>
+    <select id="selectSuperUserMenuList" resultType="com.study.business.sys.admin.repo.model.SysMenu">
+        select * from sys_menu a
+        where a.menu_type <![CDATA[ <> ]]> 'button'
+          and a.enable='1'
+        order by sort
+    </select>
+    <select id="selectRoleMenuTreeIdList" resultType="java.lang.String">
+        select m.menu_id, m.parent_id
+        from sys_menu m
+                 left join sys_role_menu rm on m.menu_id = rm.menu_id
+        where rm.role_id = #{roleId}
+          and m.menu_id not in (select m.parent_id from sys_menu m inner join sys_role_menu rm on m.menu_id = rm.menu_id and rm.role_id = #{roleId} )
+        order by m.parent_id, m.sort;
+    </select>
+</mapper>

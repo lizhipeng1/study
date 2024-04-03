@@ -1,10 +1,10 @@
 package com.study.config.security;
 
-import cn.xluobo.business.sys.admin.service.ISysUserService;
-import cn.xluobo.config.integration.IntegrationAuthentication;
-import cn.xluobo.config.integration.IntegrationAuthenticationContext;
-import cn.xluobo.config.integration.authenticator.IntegrationAuthenticator;
-import cn.xluobo.config.login.LoginUser;
+import com.study.business.sys.admin.service.ISysUserService;
+import com.study.config.integration.IntegrationAuthentication;
+import com.study.config.integration.IntegrationAuthenticationContext;
+import com.study.config.integration.authenticator.IntegrationAuthenticator;
+import com.study.config.login.LoginUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

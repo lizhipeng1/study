@@ -1441,7 +1441,7 @@ CREATE TABLE `tool_gen_table` (
   `table_comment` varchar(500) DEFAULT '' COMMENT '表描述',
   `class_name` varchar(100) DEFAULT '' COMMENT '实体类名称',
   `tpl_category` varchar(200) DEFAULT 'curd' COMMENT '使用的模板（crud单表操作 tree树表操作）',
-  `package_name` varchar(100) DEFAULT NULL COMMENT '生成包路径 如 cn.xluobo.business，最终路径 包路径+模块名+业务名',
+  `package_name` varchar(100) DEFAULT NULL COMMENT '生成包路径 如 com.study.business，最终路径 包路径+模块名+业务名',
   `module_name` varchar(30) DEFAULT NULL COMMENT '生成模块名 如 sys',
   `child_module_name` varchar(30) DEFAULT NULL COMMENT '子模块 如admin',
   `business_name` varchar(30) DEFAULT NULL COMMENT '生成业务名 如 role',

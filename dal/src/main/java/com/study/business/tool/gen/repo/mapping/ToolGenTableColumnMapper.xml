@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.business.tool.gen.repo.mapper.ToolGenTableColumnMapper">
+
+    <select id="selectDbTableColumns" resultType="com.study.business.tool.gen.repo.model.ToolGenTableColumn">
+        select column_name,
+               column_type,
+               data_type,
+               (case when (is_nullable = 'NO' <![CDATA[ && ]]> column_key != 'PRI') then '1' else null end) as is_required,
+               (case when column_key = 'PRI' then '1' else '0' end)                           as is_pk,
+               ordinal_position                                                               as sort,
+               column_comment,
+               (case when extra = 'auto_increment' then '1' else '0' end)                     as is_increment
+        from information_schema.columns
+        where table_schema = (select database())
+          and table_name = #{tableName}
+        order by ordinal_position;
+    </select>
+</mapper>

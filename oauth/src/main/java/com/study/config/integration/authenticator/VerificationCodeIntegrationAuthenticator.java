@@ -1,6 +1,6 @@
 package com.study.config.integration.authenticator;
 
-import cn.xluobo.config.integration.IntegrationAuthentication;
+import com.study.config.integration.IntegrationAuthentication;
 import org.springframework.stereotype.Component;
 
 /**

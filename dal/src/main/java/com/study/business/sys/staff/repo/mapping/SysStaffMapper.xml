@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.business.sys.staff.repo.mapper.SysStaffMapper">
+
+    <select id="selectStaffList" resultType="com.study.business.sys.staff.domain.resp.RespStaffInfo">
+        select a.*,b.username,b.locked,fcn_dict_name(a.personnel_status,'personnel_status') personnel_status_name,
+               d.dept_name
+        from sys_staff a
+            left join sys_user b on a.user_id=b.user_id
+            left join sys_dept d on a.dept_id=d.dept_id
+        where a.delete_flag='0'
+        <if test="reqSearchStaff.staffName != null and reqSearchStaff.staffName != ''">
+            and a.staff_name like concat('%',#{reqSearchStaff.staffName},'%')
+        </if>
+        <if test="reqSearchStaff.personnelStatus != null and reqSearchStaff.personnelStatus != ''">
+            and a.personnel_status = #{reqSearchStaff.personnelStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="reqSearchStaff.teacher != null">
+            and a.teacher = #{reqSearchStaff.teacher}
+        </if>
+        <if test="reqSearchStaff.sex != null and reqSearchStaff.sex != ''">
+            and a.sex = #{reqSearchStaff.sex}
+        </if>
+        <if test="reqSearchStaff.deptId != null">
+            and (a.dept_id=#{reqSearchStaff.deptId} or a.dept_id in (select dept_id from sys_dept dd where find_in_set(#{reqSearchStaff.deptId} ,dd.ancestors)))
+        </if>
+        order by a.create_time desc
+    </select>
+    <select id="selectTenantStaffCount" resultType="java.lang.Integer">
+        select count(1) from sys_staff where tenant_id=#{tenantId} and delete_flag='0'
+    </select>
+</mapper>

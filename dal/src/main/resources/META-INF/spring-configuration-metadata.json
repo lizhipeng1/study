@@ -1,0 +1,18 @@
+{
+  "properties": [
+    {
+      "sourceType": "com.study.config.properties.GenCodeProperties",
+      "defaultValue": "",
+      "name": "xluobo.tool.gen.config.base-package",
+      "type": "java.lang.String",
+      "description": "代码生成包路径"
+    },
+    {
+      "sourceType": "com.study.config.properties.GenCodeProperties",
+      "defaultValue": "A",
+      "name": "xluobo.tool.gen.config.template-configs",
+      "type": "java.util.List<com.study.business.tool.gen.domain.GenCodeTemplate>",
+      "description": "模板配置"
+    }
+  ]
+}

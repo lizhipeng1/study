@@ -1,6 +1,6 @@
 package com.study.config.integration;
 
-import cn.xluobo.config.integration.authenticator.IntegrationAuthenticator;
+import com.study.config.integration.authenticator.IntegrationAuthenticator;
 import com.alibaba.fastjson.JSON;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

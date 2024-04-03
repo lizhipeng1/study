@@ -1,10 +1,10 @@
 package com.study.config.integration.authenticator.sms;
 
-import cn.xluobo.config.integration.IntegrationAuthentication;
-import cn.xluobo.config.integration.authenticator.AbstractPreparedIntegrationAuthenticator;
-import cn.xluobo.config.integration.authenticator.sms.event.SmsAuthenticateBeforeEvent;
-import cn.xluobo.config.integration.authenticator.sms.event.SmsAuthenticateSuccessEvent;
-import cn.xluobo.config.login.LoginUser;
+import com.study.config.integration.IntegrationAuthentication;
+import com.study.config.integration.authenticator.AbstractPreparedIntegrationAuthenticator;
+import com.study.config.integration.authenticator.sms.event.SmsAuthenticateBeforeEvent;
+import com.study.config.integration.authenticator.sms.event.SmsAuthenticateSuccessEvent;
+import com.study.config.login.LoginUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;

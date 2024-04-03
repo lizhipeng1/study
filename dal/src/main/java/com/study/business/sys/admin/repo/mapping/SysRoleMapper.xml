@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.business.sys.admin.repo.mapper.SysRoleMapper">
+
+    <select id="selectUserRoleList" resultType="com.study.business.sys.admin.repo.model.SysRole">
+        select * from sys_role a
+        where a.delete_flag='0'
+          and exists(select 1 from sys_user_role b where a.role_id=b.role_id and b.user_id=#{userId} and b.tenant_id=#{tenantId} )
+        order by sort
+    </select>
+    <select id="selectUserRoleTreeIdList" resultType="java.lang.String">
+        select r.role_id, r.parent_id
+        from sys_role r
+                 left join sys_user_role ur on r.role_id= ur.role_id
+        where ur.user_id = #{userId}
+          and ur.tenant_id = #{tenantId}
+          and r.delete_flag='0'
+          and r.role_id not in (select r.parent_id from sys_role r inner join sys_user_role ur on r.role_id = ur.role_id and ur.user_id = #{userId} and ur.tenant_id = #{tenantId} )
+        order by r.parent_id, r.sort;
+    </select>
+</mapper>

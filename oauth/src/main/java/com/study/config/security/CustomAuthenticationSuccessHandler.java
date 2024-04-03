@@ -1,7 +1,7 @@
 package com.study.config.security;
 
-import cn.xluobo.business.sys.log.service.ISysUserLoginLogService;
-import cn.xluobo.core.api.APIBaseResponse;
+import com.study.business.sys.log.service.ISysUserLoginLogService;
+import com.study.core.api.APIBaseResponse;
 import com.alibaba.fastjson.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.net.UnknownHostException;
 
-@SpringBootApplication(scanBasePackages = {"cn.xluobo","cn.jljiayu"})
+@SpringBootApplication(scanBasePackages = {"com.study","cn.jljiayu"})
 @EnableTransactionManagement
 @MapperScan(value = {"cn.xluobo.*.*.*.repo.mapper"})
 public class OauthServerApplication {
